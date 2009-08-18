@@ -10,11 +10,28 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class CardChooser extends View {
-	public ArrayList<Message> cards;
+	private ArrayList<Message> cards;
 	Message inMotion = null;
+	RallyRacerClientGame.Network connection;
 
-	public CardChooser(Context context) {
+	/**
+	 * Can only invalidate from a thread that created this view.
+	 * 
+	 * @param m
+	 */
+	public void addCard(Message m) {
+		cards.add(m);
+		Log.d("cardchooser", "Added a card with contents " + m.msg
+				+ " to the hand.");
+	}
+
+	public void clearCards() {
+		cards.clear();
+	}
+
+	public CardChooser(RallyRacerClientGame context) {
 		super(context);
+		connection = context.n;
 		setFocusable(true); // necessary for getting the touch events
 
 		// TODO Auto-generated constructor stub
@@ -25,6 +42,8 @@ public class CardChooser extends View {
 		// canvas.drawColor(0xFFCCCCCC); //if you want another background color
 		for (Message c : cards) {
 			canvas.drawText(c.msg, c.x, c.y, c.p);
+			Log.d("chooser-ondraw", "Drawing a message " + c.msg + " at " + c.x
+					+ "x" + c.y);
 		}
 		Paint white = new Paint();
 		white.setARGB(255, 200, 0, 0);
@@ -49,6 +68,7 @@ public class CardChooser extends View {
 		switch (eventaction) {
 
 		case MotionEvent.ACTION_DOWN: // touch down so check if the finger is on
+			invalidate();
 			if (Y < 375) {
 				for (Message m : cards) {
 					// check if inside the bounds of the ball (circle)
@@ -66,7 +86,18 @@ public class CardChooser extends View {
 
 				}
 			} else {
-				
+				/**
+				 * No cards yet, send start game.
+				 */
+				if (cards.size() == 0 || cards.size() == 1) {
+					connection.send("startgame");
+				} else if (cards.size() == 5) {
+					String order = "CardOrder:";
+					for (Message m : cards) {
+						order += m.msg + ";";
+					}
+					connection.send(order);
+				}
 			}
 
 			break;
@@ -95,9 +126,9 @@ public class CardChooser extends View {
 
 				cards.add(i, inMotion);
 				inMotion = null;
-				cleanUp();
-			}
 
+			}
+			cleanUp();
 			break;
 		}
 		return true;

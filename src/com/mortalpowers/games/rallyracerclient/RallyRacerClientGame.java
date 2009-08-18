@@ -2,6 +2,7 @@ package com.mortalpowers.games.rallyracerclient;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
@@ -11,6 +12,7 @@ import android.util.Log;
 
 public class RallyRacerClientGame extends Activity {
 	CardChooser chooser;
+	Network n;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -18,21 +20,23 @@ public class RallyRacerClientGame extends Activity {
 		super.onCreate(savedInstanceState);
 		chooser = new CardChooser(this);
 
-		chooser.cards.add(new CardChooser.Message("No cards yet."));
+		chooser.addCard(new CardChooser.Message("No cards yet."));
 
 		chooser.cleanUp();
 		setContentView(chooser);
 		// setContentView(R.layout.main);
 
-		new Network().start();
+		n = new Network();
+		n.start();
 
 	}
 
 	public class Network extends Thread {
+		Socket s = null;
+		DataOutputStream out;
+		BufferedReader in;
 		public void run() {
-			Socket s = null;
-			DataOutputStream out;
-			BufferedReader in;
+			
 
 			try {
 				s = new Socket("lyra.mortalpowers.com", 6000);
@@ -40,20 +44,18 @@ public class RallyRacerClientGame extends Activity {
 				in = new BufferedReader(new InputStreamReader(s
 						.getInputStream()));
 				Log.d("network", "network started");
-				out.writeBytes("GET /\n");
 				String str = "Awaiting response.\n";
 				while (str != null) {
 					// .setText("Updating to string: " + str);
 					str = in.readLine();
 					Log.d("network", "Received " + str);
 					if (str.startsWith("NewCard:")) {
-						chooser.cards.clear();
+						chooser.clearCards();
 						String[] command = str.split(":");
 						String[] cards = command[1].split(";");
 						for (String card : cards) {
 							if (card.length() > 5) {
-								chooser.cards.add(new CardChooser.Message(
-										"card"));
+								chooser.addCard(new CardChooser.Message(card));
 							}
 						}
 
@@ -64,6 +66,14 @@ public class RallyRacerClientGame extends Activity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				// tv.setText(e.toString());
+			}
+		}
+		public void send(String line) {
+			try {
+				out.writeBytes(line + "\n");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
