@@ -1,14 +1,19 @@
 package com.mortalpowers.games.rallyracerclient;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 public class RallyRacerClientGame extends Activity {
 	CardChooser chooser;
@@ -20,62 +25,37 @@ public class RallyRacerClientGame extends Activity {
 		super.onCreate(savedInstanceState);
 		chooser = new CardChooser(this);
 
-		chooser.addCard(new CardChooser.Message("No cards yet."));
+		chooser.addCard(new CardChooser.Message("No cards yet..."));
 
+		
+		
+		
 		chooser.cleanUp();
 		setContentView(chooser);
 		// setContentView(R.layout.main);
+		Log.w("net", "testing logging");
+		String n = Network.request("game-server.php?action=startGame");
 
-		n = new Network();
-		n.start();
+		try {
+			JSONArray cards = new JSONArray(new JSONTokener(n));
+			chooser.clearCards();
+			for(int i = 0;i<cards.length();i++) {
+				JSONObject card = cards.getJSONObject(i);
+				String msg = card.getString("priority") + " " + card.getString("action") + " " + card.getString("quantity");
+				chooser.addCard(new CardChooser.Message(msg));
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			debugMsg("Invalid JSON received from server.");
+		}
+		chooser.cleanUp();
 
 	}
 
-	public class Network extends Thread {
-		Socket s = null;
-		DataOutputStream out;
-		BufferedReader in;
-		public void run() {
-			
-
-			try {
-				s = new Socket("lyra.mortalpowers.com", 6000);
-				out = new DataOutputStream(s.getOutputStream());
-				in = new BufferedReader(new InputStreamReader(s
-						.getInputStream()));
-				chooser.connection = this;
-				Log.d("network", "network started");
-				String str = "Awaiting response.\n";
-				while (str != null) {
-					// .setText("Updating to string: " + str);
-					str = in.readLine();
-					Log.d("network", "Received " + str);
-					if (str.startsWith("NewCard:")) {
-						chooser.clearCards();
-						String[] command = str.split(":");
-						String[] cards = command[1].split(";");
-						for (String card : cards) {
-							if (card.length() > 5) {
-								chooser.addCard(new CardChooser.Message(card));
-							}
-						}
-
-					}
-				}
-
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				// tv.setText(e.toString());
-			}
-		}
-		public void send(String line) {
-			try {
-				out.writeBytes(line + "\n");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+	public void debugMsg(String message) {
+		Toast.makeText(this, "Debug:" + message, Toast.LENGTH_LONG)
+				.show();
 	}
+
 }

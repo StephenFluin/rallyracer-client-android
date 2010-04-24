@@ -12,7 +12,7 @@ import android.view.View;
 public class CardChooser extends View {
 	private ArrayList<Message> cards;
 	Message inMotion = null;
-	RallyRacerClientGame.Network connection;
+	Network connection;
 
 	/**
 	 * Can only invalidate from a thread that created this view.
@@ -90,18 +90,15 @@ public class CardChooser extends View {
 				/**
 				 * No cards yet, send start game.
 				 */
-				if(connection == null) {
-					Log.e("redbutton","Connectoin not established, couldn't send anything.");
-					return false;
-				}
+				Network.request("");
 				if (cards.size() == 0 || cards.size() == 1) {
-					connection.send("startgame");
+					//connection.send("startgame");
 				} else if (cards.size() == 5) {
 					String order = "CardOrder:";
 					for (Message m : cards) {
 						order += m.msg + ";";
 					}
-					connection.send(order);
+					Network.request("game-server.php?action=sendCommand&command=" + order);
 				}
 			}
 
