@@ -43,6 +43,7 @@ public class RallyRacerClientGame extends Activity {
 				out = new DataOutputStream(s.getOutputStream());
 				in = new BufferedReader(new InputStreamReader(s
 						.getInputStream()));
+				chooser.connection = this;
 				Log.d("network", "network started");
 				String str = "Awaiting response.\n";
 				while (str != null) {

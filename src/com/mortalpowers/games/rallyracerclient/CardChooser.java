@@ -31,7 +31,6 @@ public class CardChooser extends View {
 
 	public CardChooser(RallyRacerClientGame context) {
 		super(context);
-		connection = context.n;
 		setFocusable(true); // necessary for getting the touch events
 
 		// TODO Auto-generated constructor stub
@@ -40,10 +39,12 @@ public class CardChooser extends View {
 
 	protected void onDraw(Canvas canvas) {
 		// canvas.drawColor(0xFFCCCCCC); //if you want another background color
-		for (Message c : cards) {
+		/**
+		 * Regular for-loop used here to avoid concurrent modifications with network thread.
+		 */
+		for (int i = 0;i<cards.size();i++) {
+			Message c = cards.get(i);
 			canvas.drawText(c.msg, c.x, c.y, c.p);
-			Log.d("chooser-ondraw", "Drawing a message " + c.msg + " at " + c.x
-					+ "x" + c.y);
 		}
 		Paint white = new Paint();
 		white.setARGB(255, 200, 0, 0);
@@ -89,6 +90,10 @@ public class CardChooser extends View {
 				/**
 				 * No cards yet, send start game.
 				 */
+				if(connection == null) {
+					Log.e("redbutton","Connectoin not established, couldn't send anything.");
+					return false;
+				}
 				if (cards.size() == 0 || cards.size() == 1) {
 					connection.send("startgame");
 				} else if (cards.size() == 5) {
