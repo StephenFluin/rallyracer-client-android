@@ -18,38 +18,49 @@ import android.widget.Toast;
 public class RallyRacerClientGame extends Activity {
 	CardChooser chooser;
 	Network n;
+	int playerId = 0;
 
+	/**
+	 * Lifecycle tutorial for myself
+	 */
+	// Only if you hit home.
+	public void onRestart() {
+
+		super.onRestart();
+	}
+	// Any way you launch, including out of memory
+	public void onResume() {
+		//debugMsg("Resuming");
+		super.onResume();
+	}
+	// Home Button or back button
+	public void onStop() {
+		//debugMsg("Stop");
+		super.onStop();
+	}
+	//  back button
+	public void onDestroy() {
+		debugMsg("destroy");
+		Network.request("game-server.php?action=clientQuit");
+		super.onDestroy();
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		chooser = new CardChooser(this);
 
-		chooser.addCard(new CardChooser.Card("No cards yet..."));
-
-		
-		
-		
-		chooser.cleanUp();
 		setContentView(chooser);
-		// setContentView(R.layout.main);
+		
 		Log.w("net", "testing logging");
-		String n = Network.request("game-server.php?action=startGame");
-
-		try {
-			JSONArray cards = new JSONArray(new JSONTokener(n));
-			chooser.clearCards();
-			for(int i = 0;i<cards.length();i++) {
-				JSONObject card = cards.getJSONObject(i);
-				String msg = card.getString("priority") + "," + card.getString("action") + "," + card.getString("quantity");
-				chooser.addCard(new CardChooser.Card(msg));
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			debugMsg("Invalid JSON received from server.");
-		}
-		chooser.cleanUp();
+		String n = Network.request("game-server.php?action=connectToGame");
+		
+		String[] parts = n.split(",");
+		playerId = Integer.parseInt(parts[0]);
+		int unit = Integer.parseInt(parts[1]);
+		
+		chooser.addCard(new CardChooser.Card("You are unit " + unit));
 
 	}
 

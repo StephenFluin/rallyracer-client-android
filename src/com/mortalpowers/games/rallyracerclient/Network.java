@@ -18,12 +18,14 @@ import android.util.Log;
 public class Network {
 
 	public static String serverPrefix = "http://mortalpowers.com/rallyracer/";
+	public static DefaultHttpClient httpclient = null;
 	public static String request(String url) {
 		url = serverPrefix + url;
 		
-		
-		Log.d("net", "Starting network class.");
-		DefaultHttpClient httpclient = new DefaultHttpClient();
+		if(httpclient == null) {
+			Log.d("net", "Starting network class.");
+			httpclient = new DefaultHttpClient();
+		}
 		HttpGet httpget = null;
 		try {
 			httpget = new HttpGet(url);
