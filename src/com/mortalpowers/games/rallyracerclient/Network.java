@@ -66,5 +66,10 @@ public class Network {
 		return null;
 
 	}
+	public static void reset() {
+		Log.d("net", "Starting network class.");
+		httpclient = new DefaultHttpClient();
+		
+	}
 
 }

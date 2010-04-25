@@ -124,6 +124,7 @@ public class CardChooser extends View {
 					Network
 							.request("game-server.php?action=sendCommand&command="
 									+ order);
+					clearCards();
 				}
 			}
 

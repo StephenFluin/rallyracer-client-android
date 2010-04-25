@@ -42,6 +42,7 @@ public class RallyRacerClientGame extends Activity {
 	public void onDestroy() {
 		debugMsg("destroy");
 		Network.request("game-server.php?action=clientQuit");
+		Network.reset();
 		super.onDestroy();
 	}
 	
