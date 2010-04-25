@@ -10,16 +10,15 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class CardChooser extends View {
-	private ArrayList<Message> cards;
-	Message inMotion = null;
-	Network connection;
+	private ArrayList<Card> cards;
+	Card inMotion = null;
 
 	/**
 	 * Can only invalidate from a thread that created this view.
 	 * 
 	 * @param m
 	 */
-	public void addCard(Message m) {
+	public void addCard(Card m) {
 		cards.add(m);
 		Log.d("cardchooser", "Added a card with contents " + m.msg
 				+ " to the hand.");
@@ -34,7 +33,7 @@ public class CardChooser extends View {
 		setFocusable(true); // necessary for getting the touch events
 
 		// TODO Auto-generated constructor stub
-		cards = new ArrayList<Message>();
+		cards = new ArrayList<Card>();
 	}
 
 	protected void onDraw(Canvas canvas) {
@@ -43,7 +42,7 @@ public class CardChooser extends View {
 		 * Regular for-loop used here to avoid concurrent modifications with network thread.
 		 */
 		for (int i = 0;i<cards.size();i++) {
-			Message c = cards.get(i);
+			Card c = cards.get(i);
 			canvas.drawText(c.msg, c.x, c.y, c.p);
 		}
 		Paint white = new Paint();
@@ -53,7 +52,7 @@ public class CardChooser extends View {
 
 	public void cleanUp() {
 		int i = 50;
-		for (Message m : cards) {
+		for (Card m : cards) {
 			m.y = i;
 			i += 75;
 		}
@@ -71,7 +70,7 @@ public class CardChooser extends View {
 		case MotionEvent.ACTION_DOWN: // touch down so check if the finger is on
 			invalidate();
 			if (Y < 375) {
-				for (Message m : cards) {
+				for (Card m : cards) {
 					// check if inside the bounds of the ball (circle)
 					// get the center for the ball
 					if (m == null) {
@@ -90,12 +89,11 @@ public class CardChooser extends View {
 				/**
 				 * No cards yet, send start game.
 				 */
-				Network.request("");
 				if (cards.size() == 0 || cards.size() == 1) {
 					//connection.send("startgame");
 				} else if (cards.size() == 5) {
-					String order = "CardOrder:";
-					for (Message m : cards) {
+					String order = "";
+					for (Card m : cards) {
 						order += m.msg + ";";
 					}
 					Network.request("game-server.php?action=sendCommand&command=" + order);
@@ -117,7 +115,7 @@ public class CardChooser extends View {
 			if (inMotion != null) {
 				cards.remove(inMotion);
 				int i = 0;
-				for (Message m : cards) {
+				for (Card m : cards) {
 
 					if (inMotion.y < m.y) {
 						break;
@@ -137,12 +135,12 @@ public class CardChooser extends View {
 
 	}
 
-	static public class Message {
+	static public class Card {
 		String msg;
 		float x, y;
 		Paint p;
 
-		public Message(String s) {
+		public Card(String s) {
 			msg = s;
 			p = new Paint();
 			p.setStrokeWidth(2);

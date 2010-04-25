@@ -25,7 +25,7 @@ public class RallyRacerClientGame extends Activity {
 		super.onCreate(savedInstanceState);
 		chooser = new CardChooser(this);
 
-		chooser.addCard(new CardChooser.Message("No cards yet..."));
+		chooser.addCard(new CardChooser.Card("No cards yet..."));
 
 		
 		
@@ -41,8 +41,8 @@ public class RallyRacerClientGame extends Activity {
 			chooser.clearCards();
 			for(int i = 0;i<cards.length();i++) {
 				JSONObject card = cards.getJSONObject(i);
-				String msg = card.getString("priority") + " " + card.getString("action") + " " + card.getString("quantity");
-				chooser.addCard(new CardChooser.Message(msg));
+				String msg = card.getString("priority") + "," + card.getString("action") + "," + card.getString("quantity");
+				chooser.addCard(new CardChooser.Card(msg));
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block

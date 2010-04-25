@@ -24,8 +24,12 @@ public class Network {
 		
 		Log.d("net", "Starting network class.");
 		DefaultHttpClient httpclient = new DefaultHttpClient();
-
-		HttpGet httpget = new HttpGet(url);
+		HttpGet httpget = null;
+		try {
+			httpget = new HttpGet(url);
+		} catch(IllegalArgumentException e) {
+			Log.e("net", "Invalid URL");
+		}
 		Log.w("net", "query crafted.");
 		HttpResponse response = null;
 		try {
@@ -33,9 +37,11 @@ public class Network {
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Log.e("net",e.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Log.e("net",e.toString());
 		}
 		HttpEntity entity = response.getEntity();
 		try {
@@ -53,6 +59,7 @@ public class Network {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Log.e("net",e.toString());
 		}
 		return null;
 
