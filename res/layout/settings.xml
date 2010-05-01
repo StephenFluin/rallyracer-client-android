@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+	<TextView android:id="@+id/label" android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:text="Game Server:" />
+	<AutoCompleteTextView android:id="@+id/autocomplete_server"
+		android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:layout_below="@+id/label" android:layout_marginLeft="5dp" />
+	<Button android:id="@+id/save_settings" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@id/autocomplete_server"
+		android:layout_alignParentRight="true" android:layout_marginLeft="10dip"
+		android:text="OK" />
+	<Button android:id="@+id/cancel_settings" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_toLeftOf="@id/save_settings"
+		android:layout_alignTop="@id/save_settings" android:text="Cancel" />
+</RelativeLayout>

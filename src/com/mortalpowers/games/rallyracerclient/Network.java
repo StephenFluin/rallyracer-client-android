@@ -17,19 +17,20 @@ import android.util.Log;
 
 public class Network {
 
-	public static String serverPrefix = "http://mortalpowers.com/rallyracer/";
+	public static String serverPrefix;
 	public static DefaultHttpClient httpclient = null;
+
 	public static String request(String url) {
 		url = serverPrefix + url;
-		
-		if(httpclient == null) {
+
+		if (httpclient == null) {
 			Log.d("net", "Starting network class.");
 			httpclient = new DefaultHttpClient();
 		}
 		HttpGet httpget = null;
 		try {
 			httpget = new HttpGet(url);
-		} catch(IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 			Log.e("net", "Invalid URL");
 		}
 		Log.w("net", "query crafted.");
@@ -39,16 +40,17 @@ public class Network {
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			Log.e("net",e.toString());
+			Log.e("net", e.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			Log.e("net",e.toString());
+			Log.e("net", e.toString());
 		}
-		HttpEntity entity = response.getEntity();
 		try {
-			BufferedReader r = new BufferedReader(new InputStreamReader(
-					entity.getContent()));
+			HttpEntity entity = response.getEntity();
+
+			BufferedReader r = new BufferedReader(new InputStreamReader(entity
+					.getContent()));
 			String line;
 			StringBuilder results = new StringBuilder();
 
@@ -61,15 +63,19 @@ public class Network {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			Log.e("net",e.toString());
+			Log.e("net", e.toString());
+		} catch (NullPointerException e) {
+			Log.e("net", e.toString());
+			return "Unable to find connect to host.";
 		}
-		return null;
+		return "error";
 
 	}
+
 	public static void reset() {
 		Log.d("net", "Starting network class.");
 		httpclient = new DefaultHttpClient();
-		
+
 	}
 
 }
